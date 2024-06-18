@@ -16,7 +16,7 @@
 int main(int argc, char* args[]) {
 
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
-		//fprintf(stderr, "Error initializing SDL.\n");
+		std::cout << "Error initializing SDL.\n";
 		return false;
 	}
 
@@ -26,50 +26,71 @@ int main(int argc, char* args[]) {
 		SDL_WINDOWPOS_CENTERED,
 		WINDOW_WIDTH,
 		WINDOW_HEIGHT,
-		SDL_WINDOW_BORDERLESS
+		SDL_WINDOW_SHOWN
+		//SDL_WINDOW_BORDERLESS
 	);
 
 	if (!window) {
-		//fprintf(stderr, "Error creating SDL Window\n");
+		std::cout << "Error creating SDL Window.\n";
 		return false;
 	}
 
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
 	if (!renderer) {
-		//fprintf(stderr, "Error creating SDL Renderer\n");
+		std::cout << "Error creating SDL Renderer.\n";
 		return false;
 	}
 
 	SDL_RenderSetLogicalSize(renderer, WINDOW_WIDTH, WINDOW_HEIGHT);
+	//SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 	SDL_SetWindowFullscreen(window, true);
-
-	//return true;
-
-	//Mix_OpenAudio(441000, MIX_DEFAULT_FORMAT, 2, 1024);
-	Mix_OpenAudio(48000, AUDIO_S16, 2, 4096);
-
-	//GameWindowBattle myActiveWindow;
-	//myActiveWindow.initializeGame();
-
-	//// Wait load window
-	//SDL_Delay(3000);
-
-	//myActiveWindow.setup();
 	
-	GameStartMenu myActiveWindow;
-	//myActiveWindow.initializeGame();
-	myActiveWindow.window = window;
-	myActiveWindow.renderer = renderer;
+	Mix_OpenAudio(48000, AUDIO_S16, 2, 1024);
 
-	myActiveWindow.setup();
+	int GameMenu = 1;
+	bool isGameRunning = true;
 
-	while (1) {
-		myActiveWindow.inputs();
-		myActiveWindow.update();
-		myActiveWindow.render();
+	while (isGameRunning) {
+
+		switch (GameMenu) {
+
+			case 1: {
+				GameStartMenu myActiveWindow;
+				myActiveWindow.window = window;
+				myActiveWindow.renderer = renderer;
+
+				myActiveWindow.setup();
+
+				while (myActiveWindow.isMenuRunning) {
+					myActiveWindow.inputs();
+					myActiveWindow.update();
+					myActiveWindow.render();
+				}
+
+				GameMenu = myActiveWindow.nextMenu;
+			} break;
+			
+			case 2: {
+				GameBattleMenu myActiveWindow;
+				myActiveWindow.window = window;
+				myActiveWindow.renderer = renderer;
+
+				myActiveWindow.setup();
+
+				while (myActiveWindow.isMenuRunning) {
+					myActiveWindow.inputs();
+					myActiveWindow.update();
+					myActiveWindow.render();
+				}
+
+				GameMenu = myActiveWindow.nextMenu;
+			} break;
+
+			default:
+				isGameRunning = false;
+				break;
+		}
 	}
-
-	myActiveWindow.destroyWindow();
 
  	return 0;
 }

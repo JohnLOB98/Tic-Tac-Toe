@@ -1,37 +1,37 @@
 #include "GameWindow.h"
 
-bool GameApp::initializeGame() {
-
-	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
-		//fprintf(stderr, "Error initializing SDL.\n");
-		return false;
-	}
-
-	window = SDL_CreateWindow(
-		NULL,
-		SDL_WINDOWPOS_CENTERED,
-		SDL_WINDOWPOS_CENTERED,
-		WINDOW_WIDTH,
-		WINDOW_HEIGHT,
-		SDL_WINDOW_BORDERLESS
-	);
-
-	if (!window) {
-		//fprintf(stderr, "Error creating SDL Window\n");
-		return false;
-	}
-
-	renderer = SDL_CreateRenderer(window, -1, 0);
-	if (!renderer) {
-		//fprintf(stderr, "Error creating SDL Renderer\n");
-		return false;
-	}
-
-	SDL_RenderSetLogicalSize(renderer, WINDOW_WIDTH, WINDOW_HEIGHT);
-	SDL_SetWindowFullscreen(window, true);
-
-	return true;
-}
+//bool GameApp::initializeGame() {
+//
+//	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
+//		std::cout << "Error initializing SDL.\n";
+//		return false;
+//	}
+//
+//	window = SDL_CreateWindow(
+//		NULL,
+//		SDL_WINDOWPOS_CENTERED,
+//		SDL_WINDOWPOS_CENTERED,
+//		WINDOW_WIDTH,
+//		WINDOW_HEIGHT,
+//		SDL_WINDOW_BORDERLESS
+//	);
+//
+//	if (!window) {
+//		std::cout << "Error creating SDL Window.\n";
+//		return false;
+//	}
+//
+//	renderer = SDL_CreateRenderer(window, -1, 0);
+//	if (!renderer) {
+//		std::cout << "Error creating SDL Renderer.\n";
+//		return false;
+//	}
+//
+//	SDL_RenderSetLogicalSize(renderer, WINDOW_WIDTH, WINDOW_HEIGHT);
+//	SDL_SetWindowFullscreen(window, true);
+//
+//	return true;
+//}
 
 void GameApp::destroyWindow() const {
 
@@ -40,8 +40,34 @@ void GameApp::destroyWindow() const {
 	SDL_Quit();
 }
 
+SDL_Texture* GameApp::loadTexture(const char* filePath) {
 
-void GameWindowBattle::setup(){
+	SDL_Texture* texture = NULL;
+	texture = IMG_LoadTexture(renderer, filePath);
+
+	if (!texture) {
+		std::cout << "Texture couldn't load from file path: " << filePath << "\nError: " << SDL_GetError() << '\n';
+	}
+
+	return texture;
+}
+
+Mix_Music* GameApp::loadMusic(const char* filePath) {
+
+	Mix_Music* music = NULL;
+	music = Mix_LoadMUS(filePath);
+	if (!music) {
+		std::cout << "Music Error: " << Mix_GetError() << '\n';
+	}
+
+	return music;
+}
+
+// GAME APP END ------------------------------------------------------------------------------------------------------------
+
+
+// GAME BATTLE MENU BEGIN --------------------------------------------------------------------------------------------------
+void GameBattleMenu::setup(){
 
 	int size = sizeof(table) / sizeof(table[0]);
 	for (int i = 0; i < size; ++i) {
@@ -64,23 +90,11 @@ void GameWindowBattle::setup(){
 	assetPlayer2[1] = loadTexture("C:/Users/Admin/Desktop/Assets/Squirtle1.png");
 	assetsTransitionBattle = loadTexture("C:/Users/Admin/Desktop/Assets/transitionBattle.png");
 
-	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
-
-
-
-	battleMusic = loadMusic("C:/Users/Admin/Desktop/Assets/Audio/pokemonWildBattle.mp3");
 	winBattleMusic = loadMusic("C:/Users/Admin/Desktop/Assets/Audio/winBattle.mp3");
 
-	Mix_PlayMusic(battleMusic, -1);
-
-	int pastSeconds = SDL_GetTicks();
-	int actualSeconds = pastSeconds;
-	while (actualSeconds - pastSeconds < 1000) {
-		actualSeconds = SDL_GetTicks();
-	}
 }
 
-void GameWindowBattle::inputs() {
+void GameBattleMenu::inputs() {
 
 	if (flagAnimation) {
 		SDL_Event event;
@@ -89,14 +103,16 @@ void GameWindowBattle::inputs() {
 		switch (event.type) {
 
 		case SDL_QUIT:
-			gameRunning = false;
+			isMenuRunning = false;
 			break;
+
 		case SDL_KEYDOWN:
-			if (event.key.keysym.sym == SDLK_ESCAPE) gameRunning = false;
+			if (event.key.keysym.sym == SDLK_ESCAPE) isMenuRunning = false;
 			break;
-		case SDL_MOUSEBUTTONDOWN:
-			MouseX = event.button.x;
-			MouseY = event.button.y;
+
+		case SDL_MOUSEBUTTONDOWN: {
+			int MouseX = event.button.x;
+			int MouseY = event.button.y;
 
 			selectedSquare = -1;
 
@@ -116,13 +132,12 @@ void GameWindowBattle::inputs() {
 			}
 
 			if (isBattleEnd) {
-				//std::cout << "The winnner is player " << winner << '\n';
+				std::cout << "The winnner is player " << winner << '\n'; 
+				isMenuRunning = false;
+				nextMenu = 1;
 				Mix_PlayMusic(winBattleMusic, -1);
-				//Mix_PausedMusic(backgroundMusic);
-				//gameRunning = false;
 			}
-
-			break;
+		} break;
 
 		case NULL:
 		default:
@@ -131,7 +146,7 @@ void GameWindowBattle::inputs() {
 	}
 }
 
-void GameWindowBattle::update() {
+void GameBattleMenu::update() {
 	
 	Uint32 actualFrameTime = SDL_GetTicks();
 	int timeWait = FRAME_TARGET_TIME - (actualFrameTime - lastFrameTime);
@@ -146,16 +161,12 @@ void GameWindowBattle::update() {
 	if (++actualFrame > FPS) actualFrame = 0;
 }
 
-void GameWindowBattle::render() {
-
-	//SDL_Rect srcrect;
-	//SDL_Rect dstrect;
+void GameBattleMenu::render() {
 
 	if (flagAnimation) {
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 		SDL_RenderClear(renderer);
 
-		// Draw Rectangle
 		SDL_Rect srcrect = { 0, 0, 340, 340 };
 		SDL_Rect dstrect = { 0, 0, 340, 340 };
 
@@ -196,7 +207,7 @@ void GameWindowBattle::render() {
 	SDL_RenderPresent(renderer);
 }
 
-char* GameWindowBattle::setSquare(char* table, int selectedSquare, char player) {
+char* GameBattleMenu::setSquare(char* table, int selectedSquare, char player) {
 
 	table[selectedSquare] = player;
 	isLineComplete(table, player);
@@ -204,7 +215,7 @@ char* GameWindowBattle::setSquare(char* table, int selectedSquare, char player) 
 	return table;
 }
 
-bool GameWindowBattle::isLineComplete(char* table, char player) {
+bool GameBattleMenu::isLineComplete(char* table, char player) {
 
 	bool flag = false;
 
@@ -227,29 +238,6 @@ bool GameWindowBattle::isLineComplete(char* table, char player) {
 
 	return flag;
 }
-
-SDL_Texture* GameWindowBattle::loadTexture(const char* filePath) {
-
-	SDL_Texture* texture = NULL;
-	texture = IMG_LoadTexture(renderer, filePath);
-
-	if (!texture) {
-		//std::cout << "Texture couldn't load from file path: " << filePath << "\nError: " << SDL_GetError() << '\n';
-	}
-
-	return texture;
-}
-
-Mix_Music* GameWindowBattle::loadMusic(const char* filePath) {
-
-	Mix_Music* music = NULL;
-	music = Mix_LoadMUS(filePath);
-	if (!music) {
-		std::cout << "Music Error: " << Mix_GetError() << '\n';
-	}
-
-	return music;
-}
 // END GAME APP BATTLE ---------------------------------------------------------------------------------------------------
 
 
@@ -265,10 +253,45 @@ void GameStartMenu::setup(){
 		};
 	}
 
+	btnBattleTexture = loadTexture("C:/Users/Admin/Desktop/Assets/btnBattle.png");
+
+	battleMusic = loadMusic("C:/Users/Admin/Desktop/Assets/Audio/pokemonWildBattle.mp3");
+	backgroundMusic = loadMusic("C:/Users/Admin/Desktop/Assets/Audio/palletTown.mp3");
+	Mix_PlayMusic(backgroundMusic, -1);
 }
 
 void GameStartMenu::inputs() {
 
+	SDL_Event event;
+	SDL_PollEvent(&event);
+
+	switch (event.type) {
+
+		case SDL_QUIT:
+			break;
+
+		case SDL_KEYDOWN:
+			if (event.key.keysym.sym == SDLK_ESCAPE) isMenuRunning = false;
+			break;
+		
+		case SDL_MOUSEBUTTONDOWN: {
+			int MouseX = event.button.x;
+			int MouseY = event.button.y;
+
+			bool flagWidth = MouseX >= Buttons[0].x && MouseX <= Buttons[0].x + Buttons[0].w;
+			bool flagHeight = MouseY >= Buttons[0].y && MouseY <= Buttons[0].y + Buttons[0].h;
+			if (flagWidth && flagHeight) {
+				isMenuRunning = false;
+				nextMenu = 2;
+				Mix_PlayMusic(battleMusic, -1);
+
+			}
+
+		} break;
+
+		default:
+			break;
+	}
 }
 
 void GameStartMenu::render() {
@@ -276,9 +299,12 @@ void GameStartMenu::render() {
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderClear(renderer);
 
+	SDL_Rect srcrect = { 0, 0, 50, 25 };
+	SDL_RenderCopy(renderer, btnBattleTexture, &srcrect, &Buttons[0]);
+
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
-	for (int i = 0; i < 3; ++i) SDL_RenderFillRect(renderer, &Buttons[i]);
+	for (int i = 1; i < 3; ++i) SDL_RenderFillRect(renderer, &Buttons[i]);
 	
 
 	SDL_RenderPresent(renderer);
@@ -295,7 +321,6 @@ void GameStartMenu::update() {
 
 	float deltaTime = (SDL_GetTicks() - lastFrameTime) / 1000.0f;
 	lastFrameTime = SDL_GetTicks();
-
 }
 
 

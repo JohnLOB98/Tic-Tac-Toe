@@ -14,54 +14,40 @@
 #define SquareWidth 100
 
 
-//int init2 = Mix_Init(0);
-
-//typedef enum {
-//
-//	MIX_INIT_FLAC = 0x000000001,
-//	MIX_INIT_MOD  = 0x000000002,
-//	MIX_INIT_MP3  = 0x000000008,
-//	MIX_INIT_OGG  = 0x000000010,
-//	MIX_INIT_MID  = 0x000000020,
-//	MIX_INIT_OPUS =	0x000000040
-//
-//} MIX_InitFlags;
-
-
 class GameApp {
 public:
 
 	SDL_Window* window;
 	SDL_Renderer* renderer;
 	int actualFrame = 0; // min 0, max 24 | FPS Macro
+	int nextMenu = -1;
 
-	//GameApp() : window(NULL), renderer(NULL) {};
-	//GameApp(SDL_Window* vWindow, SDL_Renderer* vRenderer) : window(vWindow), renderer(vRenderer) {};
-	//~GameApp() {};
+	bool isMenuRunning = true;
 
 	void destroyWindow() const;
 
-	bool initializeGame();
+	//bool initializeGame();
 
 	virtual void setup() {};
 	virtual void inputs() {};
 	virtual void update() {};
 	virtual void render() {};
 
+	SDL_Texture* loadTexture(const char* filePath);
+	Mix_Music* loadMusic(const char* filePath);
+
+
 };
 
-class GameWindowBattle : public GameApp {
+class GameBattleMenu : public GameApp {
 public:
 
 	// COOMON VARIABLES
-	bool gameRunning = 1;
 	bool flagAnimation = false;
 
 	int lastFrameTime;
 	int selectedSquare = 0;
 	int turnPlayer = 1;
-	int MouseX = 0;
-	int MouseY = 0;
 	int actualFramesAnimation = 0;
 
 	char table[9];
@@ -82,7 +68,6 @@ public:
 	SDL_Texture* assetsTransitionBattle = NULL;
 
 	// MUSIC VARIABLES
-	Mix_Music* battleMusic = NULL;
 	Mix_Music* winBattleMusic = NULL;
 
 	
@@ -95,23 +80,22 @@ public:
 	
 	char* setSquare(char* table, int selectedSquare, char player);
 	bool isLineComplete(char* table, char player);
-
-	SDL_Texture* loadTexture(const char* filePath);
-	//void loadAnimation(SDL_Texture* animation, const char* filePath, int frames);
-	Mix_Music* loadMusic(const char* filePath);
 };
+
+
 
 class GameStartMenu : public GameApp {
 public:
-	int MouseX = 0;
-	int MouseY = 0;
 	Uint32 lastFrameTime = 0;
 
-	const int widthButton = 100;
-	const int heightButton = 50;
+	const int widthButton = 44;
+	const int heightButton = 44;
 
 	SDL_Rect Buttons[3] = { NULL, NULL, NULL };
+	SDL_Texture* btnBattleTexture = NULL;
 
+	Mix_Music* battleMusic = NULL;
+	Mix_Music* backgroundMusic = NULL;
 
 	virtual void setup() override;
 	virtual void inputs() override;
