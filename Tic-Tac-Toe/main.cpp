@@ -43,7 +43,7 @@ int main(int argc, char* args[]) {
 
 	SDL_RenderSetLogicalSize(renderer, WINDOW_WIDTH, WINDOW_HEIGHT);
 	//SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
-	SDL_SetWindowFullscreen(window, true);
+	//SDL_SetWindowFullscreen(window, true);
 	
 	Mix_OpenAudio(48000, AUDIO_S16, 2, 1024);
 

@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <vector>
+#include <string>
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_mixer.h>
@@ -13,6 +14,7 @@
 
 #define SquareWidth 100
 
+typedef std::string string;
 
 class GameApp {
 public:
@@ -35,8 +37,6 @@ public:
 
 	SDL_Texture* loadTexture(const char* filePath);
 	Mix_Music* loadMusic(const char* filePath);
-
-
 };
 
 class GameBattleMenu : public GameApp {
@@ -46,7 +46,6 @@ public:
 	bool flagAnimation = false;
 
 	int lastFrameTime;
-	int selectedSquare = 0;
 	int turnPlayer = 1;
 	int actualFramesAnimation = 0;
 
@@ -56,15 +55,25 @@ public:
 	const int totalFramesAnimation = 64;
 	const int maxPlayers = 2;
 	const char players[2] = { 'o', 'x' };
+	string lineWin = "";
 
 	bool isBattleEnd = false;
 
 	// ASSETS VAIRABLES
-	SDL_Rect Squares[9] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+	struct Squares {
+
+		SDL_Rect srcrect[9] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
+		SDL_Rect dstrect[9] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
+		SDL_Texture* assets[9][24];
+		int frames[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	} Squares;
+	//SDL_Rect Squares[9] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 	SDL_Texture* assetBackground = NULL;
 	SDL_Texture* assetEmptySpace = NULL;
 	SDL_Texture* assetPlayer1[2] = { NULL, NULL };
 	SDL_Texture* assetPlayer2[2] = { NULL, NULL };
+	SDL_Texture* assetCharmanderWin[2] = { NULL, NULL };
+	SDL_Texture* assetSquirtleWin[2] = { NULL, NULL };
 	SDL_Texture* assetsTransitionBattle = NULL;
 
 	// MUSIC VARIABLES
@@ -77,7 +86,7 @@ public:
 	virtual void update() override;
 	virtual void render() override;
 
-	
+	void setWinnerSpaces(string lineWinner, char playerWinner);
 	char* setSquare(char* table, int selectedSquare, char player);
 	bool isLineComplete(char* table, char player);
 };
