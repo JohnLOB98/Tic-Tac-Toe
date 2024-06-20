@@ -37,6 +37,21 @@ public:
 
 	SDL_Texture* loadTexture(const char* filePath);
 	Mix_Music* loadMusic(const char* filePath);
+	Mix_Chunk* loadSound(const char* filePath);
+
+
+	struct constantTexture {
+		
+		SDL_Rect srcrect;
+		SDL_Rect dstrect;
+		SDL_Texture* texture;
+
+		//constantTexture(SDL_Rect& vsrcrect, SDL_Rect& vdstrect, string filePath) :
+		//	srcrect(vsrcrect), dstrect(vdstrect) {
+		//	
+		//	texture = loadTexture("hi");
+		//};
+	};
 };
 
 class GameBattleMenu : public GameApp {
@@ -50,7 +65,7 @@ public:
 	int actualFramesAnimation = 0;
 
 	char table[9];
-	char winner;
+	char winner = 'e';
 
 	const int totalFramesAnimation = 64;
 	const int maxPlayers = 2;
@@ -67,7 +82,6 @@ public:
 		SDL_Texture* assets[9][24];
 		int frames[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 	} Squares;
-	//SDL_Rect Squares[9] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 	SDL_Texture* assetBackground = NULL;
 	SDL_Texture* assetEmptySpace = NULL;
 	SDL_Texture* assetPlayer1[2] = { NULL, NULL };
@@ -78,6 +92,10 @@ public:
 
 	// MUSIC VARIABLES
 	Mix_Music* winBattleMusic = NULL;
+
+	// SOUNDS
+	Mix_Chunk* charmanderSound = NULL;
+	Mix_Chunk* squirtleSound = NULL;
 
 	
 	// 
@@ -100,11 +118,16 @@ public:
 	const int widthButton = 44;
 	const int heightButton = 44;
 
-	SDL_Rect Buttons[3] = { NULL, NULL, NULL };
+	//SDL_Rect Buttons[3] = { NULL, NULL, NULL };
 	SDL_Texture* btnBattleTexture = NULL;
+	constantTexture backgroundTexture;
+	constantTexture battleTexture;
+	constantTexture runTexture;
+	//SDL_Texture* backgroundTexture = NULL;
 
 	Mix_Music* battleMusic = NULL;
 	Mix_Music* backgroundMusic = NULL;
+
 
 	virtual void setup() override;
 	virtual void inputs() override;
