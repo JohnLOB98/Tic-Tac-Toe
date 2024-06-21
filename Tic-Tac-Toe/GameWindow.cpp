@@ -53,11 +53,14 @@ void GameBattleMenu::setup(){
 	assetSquirtleWin[1] = loadTexture("C:/Users/Admin/Desktop/Assets/squirtleWin1.png");
 
 	assetsTransitionBattle = loadTexture("C:/Users/Admin/Desktop/Assets/transitionBattle.png");
+	
 	winBattleMusic = loadMusic("C:/Users/Admin/Desktop/Assets/Audio/winBattle.mp3");
+	battleMusic = loadMusic("C:/Users/Admin/Desktop/Assets/Audio/pokemonWildBattle.mp3");
 
 	squirtleSound = loadSound("C:/Users/Admin/Desktop/Assets/Audio/squirtle.mp3");
 	charmanderSound = loadSound("C:/Users/Admin/Desktop/Assets/Audio/charmander.mp3");
 
+	Mix_PlayMusic(battleMusic, -1);
 
 	int size = sizeof(table) / sizeof(table[0]);
 	for (int i = 0; i < size; ++i) {
@@ -66,8 +69,8 @@ void GameBattleMenu::setup(){
 
 		Squares.srcrect[i] = { 0, 0, 100, 100 };
 		Squares.dstrect[i] = {
-			10 + i % 3 * (SquareWidth + 10), // x
-			10 + i / 3 * (SquareWidth + 10), // y
+			4 + i % 3 * (SquareWidth + 16), // x
+			4 + i / 3 * (SquareWidth + 16), // y
 			SquareWidth,				 // width
 			SquareWidth				 // height
 		};
@@ -116,12 +119,16 @@ void GameBattleMenu::inputs() {
 					setSquare(table, selectedSquare, players[turnPlayer - 1]);
 
 					if (turnPlayer == 1) {
-						for (int j = 0; j < 12; ++j) Squares.assets[selectedSquare][j] = assetPlayer1[0];
-						for (int j = 12; j < FPS; ++j) Squares.assets[selectedSquare][j] = assetPlayer1[1];
+						for (int j = 0; j < 6; ++j) Squares.assets[selectedSquare][j] = assetPlayer1[0];
+						for (int j = 6; j < 12; ++j) Squares.assets[selectedSquare][j] = assetPlayer1[1];
+						for (int j = 12; j < 18; ++j) Squares.assets[selectedSquare][j] = assetPlayer1[0];
+						for (int j = 18; j < FPS; ++j) Squares.assets[selectedSquare][j] = assetPlayer1[1];
 					}
 					else {
-						for (int j = 0; j < 12; ++j) Squares.assets[selectedSquare][j] = assetPlayer2[0];
-						for (int j = 12; j < FPS; ++j) Squares.assets[selectedSquare][j] = assetPlayer2[1];
+						for (int j = 0; j < 6; ++j) Squares.assets[selectedSquare][j] = assetPlayer2[0];
+						for (int j = 6; j < 12; ++j) Squares.assets[selectedSquare][j] = assetPlayer2[1];
+						for (int j = 12; j < 18; ++j) Squares.assets[selectedSquare][j] = assetPlayer2[0];
+						for (int j = 18; j < FPS; ++j) Squares.assets[selectedSquare][j] = assetPlayer2[1];
 					}
 
 					turnPlayer == 1 ? Mix_PlayChannel(-1, charmanderSound, 0) : Mix_PlayChannel(-1, squirtleSound, 0); 
@@ -139,6 +146,7 @@ void GameBattleMenu::inputs() {
 				}
 
 			} break;
+
 
 			case NULL:
 			default:
@@ -158,6 +166,19 @@ void GameBattleMenu::inputs() {
 			}
 		}
 	}
+
+	if (!isMenuRunning) {
+
+		SDL_DestroyTexture(assetBackground);
+		SDL_DestroyTexture(assetEmptySpace);
+		SDL_DestroyTexture(assetsTransitionBattle);
+
+		Mix_FreeMusic(battleMusic);
+		Mix_FreeMusic(winBattleMusic);
+		Mix_FreeChunk(charmanderSound);
+		Mix_FreeChunk(squirtleSound);
+
+	}
 }
 
 void GameBattleMenu::update() {
@@ -167,9 +188,9 @@ void GameBattleMenu::update() {
 
 	if (timeWait > 0 && timeWait <= FRAME_TARGET_TIME) SDL_Delay(timeWait);
 
-	float deltaTime = (actualFrameTime - lastFrameTime) / 1000.0f;
+	//float deltaTime = (actualFrameTime - lastFrameTime) / 1000.0f;
 
-	lastFrameTime = actualFrameTime;
+	lastFrameTime = SDL_GetTicks();
 	if (++actualFrame > FPS) actualFrame = 0;
 }
 
@@ -247,8 +268,10 @@ void GameBattleMenu::setWinnerSpaces(string lineWinner, char playerWinner) {
 
 	for (int i = 0; i < 3; ++i) {
 		
-		for (int j = 0; j < 12; ++j) Squares.assets[ spaces[i] ][j] = texture0;
-		for (int j = 12; j < FPS; ++j) Squares.assets[ spaces[i] ][j] = texture1;
+		for (int j = 0; j < 6; ++j) Squares.assets[ spaces[i] ][j] = texture0;
+		for (int j = 6; j < 12; ++j) Squares.assets[ spaces[i] ][j] = texture1;
+		for (int j = 12; j < 18; ++j) Squares.assets[spaces[i]][j] = texture0;
+		for (int j = 18; j < FPS; ++j) Squares.assets[spaces[i]][j] = texture1;
 	}
 
 }
@@ -263,7 +286,6 @@ char* GameBattleMenu::setSquare(char* table, int selectedSquare, char player) {
 		if (table[i] == 'e') isAllFull = false;
 	}
 
-	//isBattleEnd = isAllFull;
 	return table;
 }
 
@@ -329,8 +351,12 @@ void GameStartMenu::setup(){
 	runTexture.srcrect = { 0, 0, 13, 13 };
 	runTexture.dstrect = { 122, 265, 52, 52 };
 
+	textureOnEnterBtnBattle = loadTexture("C:/Users/Admin/Desktop/Assets/onBtnBattle.png");
+	textureOnLeaveBtnBattle = loadTexture("C:/Users/Admin/Desktop/Assets/battle.png");
+	textureOnEnterBtnRun = loadTexture("C:/Users/Admin/Desktop/Assets/onBtnRun.png");
+	textureOnLeaveBtnRun = loadTexture("C:/Users/Admin/Desktop/Assets/run.png");
 
-	battleMusic = loadMusic("C:/Users/Admin/Desktop/Assets/Audio/pokemonWildBattle.mp3");
+
 	backgroundMusic = loadMusic("C:/Users/Admin/Desktop/Assets/Audio/palletTown.mp3");
 	Mix_PlayMusic(backgroundMusic, -1);
 }
@@ -360,7 +386,7 @@ void GameStartMenu::inputs() {
 			if (flagWidth && flagHeight) {
 				isMenuRunning = false;
 				nextMenu = 2;
-				Mix_PlayMusic(battleMusic, -1);
+				//Mix_PlayMusic(battleMusic, -1);
 			}
 
 			vRect = runTexture.dstrect;
@@ -370,8 +396,44 @@ void GameStartMenu::inputs() {
 
 		} break;
 
+
+		case SDL_MOUSEMOTION: {
+
+			int MouseX = event.button.x;
+			int MouseY = event.button.y;
+
+			bool flagX = MouseX >= battleTexture.dstrect.x && MouseX <= battleTexture.dstrect.x + battleTexture.dstrect.w;
+			bool flagY = MouseY >= battleTexture.dstrect.y && MouseY <= battleTexture.dstrect.y + battleTexture.dstrect.h;
+			
+			// OnMouseEnter_btnBattle | OnMouseLeave_btnBattle
+			battleTexture.texture = flagX && flagY ? textureOnEnterBtnBattle : textureOnLeaveBtnBattle;
+
+
+			flagX = MouseX >= runTexture.dstrect.x && MouseX <= runTexture.dstrect.x + runTexture.dstrect.w;
+			flagY = MouseY >= runTexture.dstrect.y && MouseY <= runTexture.dstrect.y + runTexture.dstrect.h;
+			// OnMouseEnter_btnRun | OnMouseEnter_btnRun 
+			runTexture.texture = flagX && flagY ? textureOnEnterBtnRun : textureOnLeaveBtnRun;
+
+
+		} break;
+
 		default:
 			break;
+	}
+
+	if (!isMenuRunning) {
+
+		SDL_DestroyTexture(btnBattleTexture);
+		SDL_DestroyTexture(textureOnEnterBtnBattle);
+		SDL_DestroyTexture(textureOnLeaveBtnBattle);
+		SDL_DestroyTexture(textureOnEnterBtnRun);
+		SDL_DestroyTexture(textureOnLeaveBtnRun);
+
+		Mix_FreeMusic(backgroundMusic);
+
+		backgroundTexture.Destroy();
+		battleTexture.Destroy();
+		runTexture.Destroy();
 	}
 }
 
@@ -388,10 +450,10 @@ void GameStartMenu::render() {
 void GameStartMenu::update() {
 		
 	Uint32 actualFrameTime = SDL_GetTicks();
-	int timeWait = FRAME_TARGET_TIME - (actualFrame - lastFrameTime);
+	int timeWait = FRAME_TARGET_TIME - (actualFrameTime - lastFrameTime);
 
 	if (timeWait > 0 && timeWait <= FRAME_TARGET_TIME) SDL_Delay(timeWait);
 
-	float deltaTime = (SDL_GetTicks() - lastFrameTime) / 1000.0f;
 	lastFrameTime = SDL_GetTicks();
+	float deltaTime = (SDL_GetTicks() - lastFrameTime) / 1000.0f;
 }

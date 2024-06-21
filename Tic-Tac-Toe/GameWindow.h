@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+//#include <functional>
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_mixer.h>
@@ -28,8 +29,6 @@ public:
 
 	void destroyWindow() const;
 
-	//bool initializeGame();
-
 	virtual void setup() {};
 	virtual void inputs() {};
 	virtual void update() {};
@@ -45,6 +44,13 @@ public:
 		SDL_Rect srcrect;
 		SDL_Rect dstrect;
 		SDL_Texture* texture;
+
+		void Destroy() {
+
+			SDL_DestroyTexture(texture);
+		}
+		//void onMouseEnter(SDL_Texture* a, std::function<void(SDL_Texture*)> func) { return func(a); }
+		//void onMouseLeave(SDL_Texture* a, std::function<void(SDL_Texture*)> func) { return func(a); }
 
 		//constantTexture(SDL_Rect& vsrcrect, SDL_Rect& vdstrect, string filePath) :
 		//	srcrect(vsrcrect), dstrect(vdstrect) {
@@ -74,7 +80,7 @@ public:
 
 	bool isBattleEnd = false;
 
-	// ASSETS VAIRABLES
+	// ASSETS
 	struct Squares {
 
 		SDL_Rect srcrect[9] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
@@ -90,12 +96,13 @@ public:
 	SDL_Texture* assetSquirtleWin[2] = { NULL, NULL };
 	SDL_Texture* assetsTransitionBattle = NULL;
 
-	// MUSIC VARIABLES
-	Mix_Music* winBattleMusic = NULL;
+	// MUSIC 
+	Mix_Music* winBattleMusic = nullptr;
+	Mix_Music* battleMusic = nullptr;
 
 	// SOUNDS
-	Mix_Chunk* charmanderSound = NULL;
-	Mix_Chunk* squirtleSound = NULL;
+	Mix_Chunk* charmanderSound = nullptr;
+	Mix_Chunk* squirtleSound = nullptr;
 
 	
 	// 
@@ -118,15 +125,20 @@ public:
 	const int widthButton = 44;
 	const int heightButton = 44;
 
-	//SDL_Rect Buttons[3] = { NULL, NULL, NULL };
-	SDL_Texture* btnBattleTexture = NULL;
+	SDL_Texture* btnBattleTexture = nullptr;
+	SDL_Texture* textureOnEnterBtnBattle = nullptr;
+	SDL_Texture* textureOnLeaveBtnBattle = nullptr;
+	SDL_Texture* textureOnEnterBtnRun = nullptr;
+	SDL_Texture* textureOnLeaveBtnRun = nullptr;
 	constantTexture backgroundTexture;
 	constantTexture battleTexture;
 	constantTexture runTexture;
-	//SDL_Texture* backgroundTexture = NULL;
 
-	Mix_Music* battleMusic = NULL;
-	Mix_Music* backgroundMusic = NULL;
+
+	Mix_Music* backgroundMusic = nullptr;
+
+	GameStartMenu() {};
+	~GameStartMenu() { std::cout << "The window has been destroyed."; };
 
 
 	virtual void setup() override;

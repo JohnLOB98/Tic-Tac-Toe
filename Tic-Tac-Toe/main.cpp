@@ -55,35 +55,37 @@ int main(int argc, char* args[]) {
 		switch (GameMenu) {
 
 			case 1: {
-				GameStartMenu myActiveWindow;
-				myActiveWindow.window = window;
-				myActiveWindow.renderer = renderer;
+				GameStartMenu* myActiveWindow = new GameStartMenu();
+				myActiveWindow->window = window;
+				myActiveWindow->renderer = renderer;
 
-				myActiveWindow.setup();
+				myActiveWindow->setup();
 
-				while (myActiveWindow.isMenuRunning) {
-					myActiveWindow.inputs();
-					myActiveWindow.update();
-					myActiveWindow.render();
+				while (myActiveWindow->isMenuRunning) {
+					myActiveWindow->inputs();
+					myActiveWindow->update();
+					myActiveWindow->render();
 				}
 
-				GameMenu = myActiveWindow.nextMenu;
+				GameMenu = myActiveWindow->nextMenu;
+				delete myActiveWindow;
 			} break;
 			
 			case 2: {
-				GameBattleMenu myActiveWindow;
-				myActiveWindow.window = window;
-				myActiveWindow.renderer = renderer;
+				GameBattleMenu* myActiveWindow = new GameBattleMenu();
+				myActiveWindow->window = window;
+				myActiveWindow->renderer = renderer;
 
-				myActiveWindow.setup();
+				myActiveWindow->setup();
 
-				while (myActiveWindow.isMenuRunning) {
-					myActiveWindow.inputs();
-					myActiveWindow.update();
-					myActiveWindow.render();
+				while (myActiveWindow->isMenuRunning) {
+					myActiveWindow->inputs();
+					myActiveWindow->update();
+					myActiveWindow->render();
 				}
 
-				GameMenu = myActiveWindow.nextMenu;
+				GameMenu = myActiveWindow->nextMenu;
+				delete myActiveWindow;
 			} break;
 
 			default:
