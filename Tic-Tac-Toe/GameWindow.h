@@ -17,17 +17,22 @@
 
 typedef std::string string;
 
+//char* pathAssets;
+//
+//string onEmptySpace = "onEmptySpace";
+
+
 class GameApp {
 public:
 
 	SDL_Window* window;
-	SDL_Renderer* renderer;
+	SDL_Renderer* renderer; 
 	int actualFrame = 0; // min 0, max 24 | FPS Macro
 	int nextMenu = -1;
 
 	bool isMenuRunning = true;
 
-	void destroyWindow() const;
+	//void destroyWindow() const;
 
 	virtual void setup() {};
 	virtual void inputs() {};
@@ -37,6 +42,8 @@ public:
 	SDL_Texture* loadTexture(const char* filePath);
 	Mix_Music* loadMusic(const char* filePath);
 	Mix_Chunk* loadSound(const char* filePath);
+
+	void DestroyListTextures(std::vector<SDL_Texture*> animation);
 
 
 	struct constantTexture {
@@ -49,22 +56,20 @@ public:
 
 			SDL_DestroyTexture(texture);
 		}
-		//void onMouseEnter(SDL_Texture* a, std::function<void(SDL_Texture*)> func) { return func(a); }
-		//void onMouseLeave(SDL_Texture* a, std::function<void(SDL_Texture*)> func) { return func(a); }
-
-		//constantTexture(SDL_Rect& vsrcrect, SDL_Rect& vdstrect, string filePath) :
-		//	srcrect(vsrcrect), dstrect(vdstrect) {
-		//	
-		//	texture = loadTexture("hi");
-		//};
 	};
 };
 
 class GameBattleMenu : public GameApp {
 public:
 
-	// COOMON VARIABLES
-	bool flagAnimation = false;
+	// CONSTRUCTORS
+	~GameBattleMenu();
+
+	// COMMON VARIABLES
+	bool flagAnimation1 = false;
+	bool flagAnimation2 = false;
+	bool activeReturnAnimation = false;
+	bool isBattleEnd = false;
 
 	int lastFrameTime;
 	int turnPlayer = 1;
@@ -73,28 +78,34 @@ public:
 	char table[9];
 	char winner = 'e';
 
-	const int totalFramesAnimation = 64;
+	const int totalFramesAnimation1 = 32;
+	const int totalFramesAnimation2 = 25;
 	const int maxPlayers = 2;
 	const char players[2] = { 'o', 'x' };
+	
 	string lineWin = "";
 
-	bool isBattleEnd = false;
-
-	// ASSETS
+	// TEXTURES
 	struct Squares {
 
 		SDL_Rect srcrect[9] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
 		SDL_Rect dstrect[9] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
-		SDL_Texture* assets[9][24];
+		std::vector<std::vector<SDL_Texture*>> textures;
 		int frames[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 	} Squares;
-	SDL_Texture* assetBackground = NULL;
-	SDL_Texture* assetEmptySpace = NULL;
-	SDL_Texture* assetPlayer1[2] = { NULL, NULL };
-	SDL_Texture* assetPlayer2[2] = { NULL, NULL };
-	SDL_Texture* assetCharmanderWin[2] = { NULL, NULL };
-	SDL_Texture* assetSquirtleWin[2] = { NULL, NULL };
-	SDL_Texture* assetsTransitionBattle = NULL;
+
+	SDL_Texture* textureBackground = nullptr;
+	SDL_Texture* textureOnLeaveEmptySpace = nullptr;
+	SDL_Texture* textureOnEnterEmptySpace = nullptr;
+	SDL_Texture* textureTransitionBattle = nullptr;
+	SDL_Texture* animationSquares = nullptr;
+
+	std::vector<SDL_Texture*> texturesCharmander;
+	std::vector<SDL_Texture*> texturesCharmanderWin;
+	std::vector<SDL_Texture*> texturesSquirtle;
+	std::vector<SDL_Texture*> texturesSquirtleWin;
+
+	constantTexture backgroundTexture;
 
 	// MUSIC 
 	Mix_Music* winBattleMusic = nullptr;
@@ -104,19 +115,17 @@ public:
 	Mix_Chunk* charmanderSound = nullptr;
 	Mix_Chunk* squirtleSound = nullptr;
 
-	
-	// 
 	virtual void setup() override;
 	virtual void inputs() override;
 	virtual void update() override;
 	virtual void render() override;
 
+	// METHODS
 	void setWinnerSpaces(string lineWinner, char playerWinner);
-	char* setSquare(char* table, int selectedSquare, char player);
-	bool isLineComplete(char* table, char player);
+	void setSquare(int selectedSquare, char player);
+	bool isLineComplete(char player);
+	bool isSpaceAvailable();
 };
-
-
 
 class GameStartMenu : public GameApp {
 public:
@@ -134,12 +143,10 @@ public:
 	constantTexture battleTexture;
 	constantTexture runTexture;
 
-
 	Mix_Music* backgroundMusic = nullptr;
 
 	GameStartMenu() {};
-	~GameStartMenu() { std::cout << "The window has been destroyed."; };
-
+	~GameStartMenu();
 
 	virtual void setup() override;
 	virtual void inputs() override;

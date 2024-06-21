@@ -1,4 +1,3 @@
-#include <iostream>
 
 // SDL Installation and Game Loop Tutorials
 //https://www.youtube.com/watch?v=tmGBhM8AEj8
@@ -42,10 +41,15 @@ int main(int argc, char* args[]) {
 	}
 
 	SDL_RenderSetLogicalSize(renderer, WINDOW_WIDTH, WINDOW_HEIGHT);
+	SDL_SetWindowTitle(window, "Tic-Tac-Toe");
+	SDL_Surface* icon = IMG_Load("C:/Users/Admin/Desktop/Assets/icon.png");
+	SDL_SetWindowIcon(window, icon);
 	//SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 	//SDL_SetWindowFullscreen(window, true);
 	
 	Mix_OpenAudio(48000, AUDIO_S16, 2, 1024);
+
+	//pathAssets = SDL_GetBasePath();
 
 	int GameMenu = 1;
 	bool isGameRunning = true;
