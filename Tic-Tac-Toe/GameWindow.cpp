@@ -250,9 +250,8 @@ void GameBattleMenu::render() {
 
 	if (activeReturnAnimation) {
 		
-		if (actualFramesAnimation > totalFramesAnimation1 / 2) {
+		if (actualFramesAnimation > totalFramesAnimation1 / 2)
 			SDL_RenderCopy(renderer, backgroundTexture.texture, &backgroundTexture.srcrect, &backgroundTexture.dstrect);
-		} /*SDL_RenderCopy(renderer, assetBackground, &dstrect, &dstrect);*/
 
 		int x = actualFramesAnimation % 6 * 34; // 34 is texture width in px
 		int y = actualFramesAnimation / 6 * 34;
@@ -370,9 +369,6 @@ void GameBattleMenu::setSquare(int selectedSquare, char player) {
 	for (int i = 0; i < 9; ++i) {
 		if (table[i] == 'e') isAllFull = false;
 	}
-
-	//isBattleEnd = isAllFull;
-	//return table;
 }
 
 bool GameBattleMenu::isLineComplete(char player) {
